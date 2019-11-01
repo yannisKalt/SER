@@ -1,25 +1,29 @@
 import os
-import pandas as pd
+import librosa
 import numpy as np
 from scipy.signal.windows import hamming
-from scipy.io import wavfile
 
-def load_wavfiles():
+def load_AESDD(sr = 22050):
     """ 
-    Load Acted Emotional Speech Dynamic Database.
-    """
+    Load A.E.S.D.D dataset.
+        [Input]: Sampling rate. Wav files are resampled to the specified
+                 sampling rate.
 
-    database_path = './Acted Emotional Speech Dynamic Database/'
-    os.chdir(database_path)
-    audio_files = []
-    for sentiment in os.listdir():
-        for audio_file in os.listdir(sentiment):
+        Output: A list of (audio_samples_array, emotion_class) tuples.
+    """
+    speech_signals = [] 
+    dataset_path = './Acted Emotional Speech Dynamic Database/'
+    for sentiment in os.listdir(dataset_path):
+        for audiofile in os.listdir(dataset_path + sentiment):
+            audio_path = dataset_path + sentiment + '/' + audiofile
             try:
-                audio = wavfile.read(sentiment + '/' + audio_file)
-                audio_files.append([audio[1], sentiment])
+                speech_signal, sr = librosa.load(audio_path, sr = sr)
+                speech_signals.append((speech_signal, sentiment))
             except:
-                pass
-    return audio_files
+                pass #In case of broken audiofiles
+
+    return speech_signals
+
 def frame_signal(fs, signal, frame_size = 0.025, frame_step = 0.01):
     """
     Split the signal into several frames via hamming window
