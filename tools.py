@@ -5,11 +5,11 @@ import pandas as pd
 
 def load_AESDD(sr = 22050):
     """ 
-    Load A.E.S.D.D dataset.
+        Load A.E.S.D.D dataset.
         [Input]: Sampling rate. Wav files are resampled to the specified
                  sampling rate.
 
-        Output: A list of (audio_samples_array, emotion_class) tuples.
+        [Output]: A list of (audio_samples_array, emotion_class) tuples.
     """
     speech_signals = [] 
     dataset_path = './Acted Emotional Speech Dynamic Database/'
@@ -24,15 +24,16 @@ def load_AESDD(sr = 22050):
 
     return speech_signals
 
-def features_to_dataframe():
+def create_features_label_dataframe():
     """
-        Compute ZCR, RMS, MFCC, Rolloff Features
-        from AESDD Dataset.
+        Computes the features/label for each utterance.
 
-        -Input: None
-        -Output: Feature-Sentiment Dataframe
+        [Input]: None.
+
+        [Output]: A features/label dataframe.
 
     """
+
     audio = load_AESDD()
     sentiments = pd.Series([k[1] for k in audio])
     feature_matrix = []
@@ -58,6 +59,16 @@ def features(sample, sr = 22050, num_frames = 6):
     """
         Compute ZCR, RMS, MFCC, Rolloff Frequency Features
         for a single utterance.
+    
+        [Input]: 
+             sample -> A single utterance (1d array)
+             sr -> sampling rate
+             num_frames -> number of desired frames.
+
+        [Output]: The feature vector for this audio sample. 
+
+
+        [Notes]: Frame overlapping is set to 0.5 by default.
 
     """
     # n: frame_length

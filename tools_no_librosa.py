@@ -1,3 +1,7 @@
+"""
+Numba was not compatible for python3.8 (for a bit) thus librosa was not possible to install.
+"""
+
 import os
 import soundfile as sf
 import numpy as np
@@ -6,8 +10,18 @@ from tensorflow import keras
 from tensorflow.keras.utils import to_categorical
 
 def aesdd_spectrogram():
-    
-    # (1) Load and subsample audio files 44kHz - 11kHz#
+    """
+        Compute the spectrogram for each AESDD utterance.
+
+        [Input]: None
+        
+        [Output]: A (n_utterances, samples_per_frame, num_frames, 1) np.array 
+                  representing the spectrogram of each utterance.
+
+        [Notes]: The fifth dimentions represents the channels (used for conv2d)
+
+    """
+    # Load and subsample audio files 44kHz -> 11kHz
     speech_signals = []
     sentiments_dir = {'anger': 0, 'disgust': 1, 'fear': 2, 'happiness':3, 'sadness': 4}
     dataset_path = './Acted Emotional Speech Dynamic Database/'
@@ -38,7 +52,18 @@ def aesdd_spectrogram():
     return spectro, to_categorical(labels)
 
 
-def split_training_set(data, labels, train_percentage= 2 / 3):
+def split_dataset(data, labels, train_percentage= 2 / 3):
+        
+    """
+        Split Dataset regardless of its representation (features or spectro)
+
+        [Input]: Data -> Features Or Spectrogram for each utterance
+                 labels -> Sentiment class (str)
+                 train_percentage -> The ratio len(X_train) / len(X_test)
+
+        [Output]: The tuple (X_train ,X_test, Y_train, Y_test)
+
+    """
     random_indices = np.random.permutation(range(len(data)))
     n_training = np.int(np.ceil(train_percentage * data.shape[0]))
     train_indices = random_indices[:n_training]
