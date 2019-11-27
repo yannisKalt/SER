@@ -20,7 +20,7 @@ def aesdd_spectrogram():
         [Output]: A (n_utterances, samples_per_frame, num_frames, 1) np.array 
                   representing the spectrogram of each utterance.
 
-        [Notes]: The fifth dimentions represents the channels (used for conv2d)
+        [Notes]: The fifth dimension represents the channels (used for conv2d)
 
     """
     # Load and subsample audio files 44kHz -> 14.7kHz
