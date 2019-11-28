@@ -54,7 +54,7 @@ def aesdd_spectrogram():
     return spectro, to_categorical(labels)
 
 
-def split_dataset(data, labels, train_percentage= 2 / 3):
+def split_dataset(data, labels, train_percentage= 0.7):
     """
         Split Dataset regardless of its representation (features or spectro)
 
