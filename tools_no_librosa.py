@@ -23,7 +23,7 @@ def aesdd_spectrogram():
         [Notes]: The fifth dimension represents the channels (used for conv2d)
 
     """
-    # Load and subsample audio files 44kHz -> 14.7kHz
+    # Load and subsample audio files 44kHz -> 22kHz
     speech_signals = []
     sentiments_dir = {'anger': 0, 'disgust': 1, 'fear': 2, 'happiness':3, 'sadness': 4}
     dataset_path = './Acted Emotional Speech Dynamic Database/'
@@ -33,7 +33,7 @@ def aesdd_spectrogram():
             audio_path = dataset_path + sentiment + '/' + audiofile
             try:
                 speech_signal, sr = sf.read(audio_path)
-                speech_signal, sr = signal.decimate(speech_signal, 3), sr // 3
+                speech_signal, sr = signal.decimate(speech_signal, 2), sr // 2
                 speech_signals.append((speech_signal, sentiments_dir[sentiment]))
             except:
                 pass #In case of broken audiofiles
@@ -45,11 +45,14 @@ def aesdd_spectrogram():
     samples = np.array([np.append(k[0], np.zeros(max_dur - len(k[0]))) 
                        for k in speech_signals]) 
 
+
     labels = np.array([k[1] for k in speech_signals]) 
 
+     
     # Compute Spectrogram For Each Utterance 
-    spectro = np.array([signal.spectrogram(k, nperseg = np.int(0.05 * sr))[-1] 
+    spectro = np.array([signal.spectrogram(k, nperseg = 2048)[-1] 
                         for k in samples])
+
     spectro = spectro.reshape((spectro.shape[0], spectro.shape[1], spectro.shape[2], 1))
     return spectro, to_categorical(labels)
 
@@ -78,7 +81,9 @@ def split_dataset(data, labels, train_percentage= 0.7):
     return X_train, X_test, Y_train, Y_test
 
     
-
+def from_categorical(labels):
+    return np.array([i for label in labels for i, k in enumerate(label) 
+                    if k == 1])    
     
 
     
