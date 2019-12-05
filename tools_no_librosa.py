@@ -23,7 +23,7 @@ def aesdd_spectrogram():
         [Notes]: The fifth dimension represents the channels (used for conv2d)
 
     """
-    # Load and subsample audio files 44kHz -> 22kHz
+    # Load and downsample audio files 44kHz -> 22kHz
     speech_signals = []
     sentiments_dir = {'anger': 0, 'disgust': 1, 'fear': 2, 'happiness':3, 'sadness': 4}
     dataset_path = './Acted Emotional Speech Dynamic Database/'
@@ -62,7 +62,7 @@ def split_dataset(data, labels, train_percentage= 0.7):
         Split Dataset regardless of its representation (features or spectro)
 
         [Input]: Data -> Features Or Spectrogram for each utterance
-                 labels -> Sentiment class (str)
+                 labels -> Sentiment class
                  train_percentage -> The ratio len(X_train) / len(X_test)
 
         [Output]: The tuple (X_train ,X_test, Y_train, Y_test)
