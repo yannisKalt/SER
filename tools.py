@@ -49,7 +49,7 @@ def create_features_label_dataframe():
         ['rf50_mean', 'rf50_std'] +
         ['rf70_mean', 'rf70_std'] +
         ['rf85_mean', 'rf85_std'] +
-        ['mfcc%s_mean' %(k + 1) for k in range(13)],
+        ['mfcc%s_mean' %(k + 1) for k in range(13)]+
         ['mfcc%s_std' %(k + 1) for k in range(13)]
         )
     data = pd.DataFrame(feature_matrix, columns = data_labels)
