@@ -52,7 +52,8 @@ def create_features_label_dataframe():
         ['mfcc%s_mean' %(k + 1) for k in range(13)]+
         ['mfcc%s_std' %(k + 1) for k in range(13)]
         )
-    data = pd.DataFrame(feature_matrix, columns = data_labels)
+    data = pd.DataFrame(feature_matrix)
+    data.columns = data_labels
     data['sentiment'] = sentiments
     return data
 
