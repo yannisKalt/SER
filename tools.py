@@ -43,19 +43,21 @@ def create_features_label_dataframe():
     
     feature_matrix = np.array(feature_matrix)
     data_labels = (
-        ['zcr_f%s' % fn for fn in range(6)] +
-        ['rms_f%s' % fn for fn in range(6)] +
-        ['rf30_f%s' % fn for fn in range(6)] +
-        ['rf50_f%s' % fn for fn in range(6)] +
-        ['rf70_f%s' %fn for fn in range(6)] +
-        ['rf85_f%s' %fn for fn in range(6)] +
-        ['mfcc%s_f%s' %(k +1, fn) for k in range(13) for fn in range(6)]
+        ['zcr_mean', 'zcr_std'] +
+        ['rms_mean', 'rms_std'] +
+        ['rf30_mean', 'rf30_std'] +
+        ['rf50_mean', 'rf50_std'] +
+        ['rf70_mean', 'rf70_std'] +
+        ['rf85_mean', 'rf85_std'] +
+        ['mfcc%s_mean' %(k + 1) for k in range(13)]+
+        ['mfcc%s_std' %(k + 1) for k in range(13)]
         )
-    data = pd.DataFrame(feature_matrix, columns = data_labels)
+    data = pd.DataFrame(feature_matrix)
+    data.columns = data_labels
     data['sentiment'] = sentiments
     return data
 
-def features(sample, sr = 22050, num_frames = 6):
+def features(sample, sr = 22050, frame_length = 2048, hop_length = 1024):
     """
         Compute ZCR, RMS, MFCC, Rolloff Frequency Features
         for a single utterance.
@@ -71,47 +73,39 @@ def features(sample, sr = 22050, num_frames = 6):
         [Notes]: Frame overlapping is set to 0.5 by default.
 
     """
-    # n: frame_length
-    # h: hop_length
-    # l: sample length
-    # t: last frame index   
-
     
-    t = num_frames - 1
-    
-    while len(sample) % (t + 2):
-        sample = np.append(sample, 0)
+    # Compute Features For All Frames
+    zcr = librosa.feature.zero_crossing_rate(sample, frame_length, 
+                                             hop_length)
 
-    l = len(sample)
-    n = np.int(np.ceil(2 * l / (t + 2)))
-    h = n // 2
-    
-    # Compute Features 
-    zcr = librosa.feature.zero_crossing_rate(sample, frame_length = n,
-                                             hop_length = h, center = False)
 
-    rms = librosa.feature.rms(y = sample, frame_length = n, 
-                              hop_length = h, center = False)
+    rms = librosa.feature.rms(sample, frame_length = frame_length, 
+                              hop_length = hop_length)
 
-    rolloff_30 = librosa.feature.spectral_rolloff(sample, n_fft = n, hop_length = h,
-                                                  center = False, roll_percent = 0.3)
+    rolloff_30 = librosa.feature.spectral_rolloff(sample, n_fft = frame_length, 
+                                                  hop_length = hop_length, roll_percent = 0.3)
 
-    rolloff_50 = librosa.feature.spectral_rolloff(sample, n_fft = n, hop_length = h,
-                                                  center = False, roll_percent = 0.5)
+    rolloff_50 = librosa.feature.spectral_rolloff(sample, n_fft = frame_length, 
+                                                  hop_length = hop_length, roll_percent = 0.5)
 
-    rolloff_70 = librosa.feature.spectral_rolloff(sample, n_fft = n, hop_length = h,
-                                                  center = False, roll_percent = 0.7)
-    
-    rolloff_85 = librosa.feature.spectral_rolloff(sample, n_fft = n, hop_length = h,
-                                                  center = False, roll_percent = 0.85)
+    rolloff_70 = librosa.feature.spectral_rolloff(sample, n_fft = frame_length, 
+                                                  hop_length = hop_length, roll_percent = 0.7)
 
-    mfcc = librosa.feature.mfcc(sample, n_fft = n, hop_length = h, 
-                                center = False, n_mfcc = 13)
+    rolloff_85 = librosa.feature.spectral_rolloff(sample, n_fft = frame_length, 
+                                                  hop_length = hop_length, roll_percent = 0.85)
 
-    mfcc = np.reshape(mfcc, (1, mfcc.size)) 
-    
-    feature_vector = np.concatenate([zcr, rms, rolloff_30, rolloff_50, rolloff_70, 
-                                    rolloff_85, mfcc], axis = None)
+
+    mfcc = librosa.feature.mfcc(sample, n_fft = frame_length, 
+                                hop_length = hop_length, n_mfcc = 13)
+
+
+    feature_vector = np.array([np.mean(zcr), np.std(zcr),
+                               np.mean(rms), np.std(rms),
+                               np.mean(rolloff_30), np.std(rolloff_30),
+                               np.mean(rolloff_50), np.std(rolloff_50),
+                               np.mean(rolloff_70), np.mean(rolloff_70),
+                               np.mean(rolloff_85), np.mean(rolloff_85),
+                               *np.mean(mfcc, axis = 1), *np.std(mfcc, axis = 1)])
     return feature_vector
 
 
