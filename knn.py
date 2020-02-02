@@ -30,7 +30,7 @@ X_train = standard_scaler.transform(X_train)
 clf = neighbors.KNeighborsClassifier(n_neighbors=14,weights='distance',algorithm='ball_tree',metric='canberra',leaf_size=66,p=2)
 clf.fit(X_train, y_train)
 accuracy = clf.score(X_test, y_test)
-
+print(accuracy)
 #Predicting the test set results
 y_pred = clf.predict(X_test)
 
