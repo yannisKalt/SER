@@ -5,6 +5,7 @@ def cnn():
 
     model = keras.Sequential()
     model.add(keras.layers.InputLayer(input_shape = X_train.shape[1:]))
+    model.add(keras.layers.BatchNormalization())
 
     model.add(keras.layers.Conv2D(12, 5, (3,2), activation = 'relu'))
     model.add(keras.layers.Dropout(0.3))
